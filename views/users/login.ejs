@@ -1,0 +1,49 @@
+<div class="row my-5 justify-content-center">
+    <div class="col-10 col-md-6 col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h3><%=title%></h3>
+            </div>
+            <div class="card-body">
+                <form name="frm">
+                    <input type="text" class="form-control mb-3" name="email" value="blue@test.com">
+                    <input type="password" class="form-control mb-3" name="password" value="12341234">
+                    <button class="btn btn-primary w-100">로그인</button>
+                </form>
+                <div class="text-end mt-3">
+                    <a href="/users/join">회원가입</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="module">
+    import { app } from '/javascripts/config.js'
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
+    const auth = getAuth(app)
+
+    // 로그인 버튼 클릭 처리
+    $(frm).on('submit', function (ev) {
+        ev.preventDefault()
+
+        const email = $(frm.email).val()
+        const password = $(frm.password).val()
+
+        signInWithEmailAndPassword(auth, email, password).then(success => {
+            alert("로그인 성공")
+
+            sessionStorage.setItem('email', email)
+
+            const targetHref = sessionStorage.getItem('target')
+
+            if (targetHref) {
+                location.href = targetHref
+            } else {
+                location.href = "/"
+            }
+        }).catch(error => {
+            alert("로그인 실패 - " + error.message)
+        })
+    })
+</script>
