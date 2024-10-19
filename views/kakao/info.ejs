@@ -13,7 +13,7 @@
                 <div class="mb-3">저자 : <%=info.authors%></div>
                 <div class="mb-3">ISBN : <%=info.isbn%></div>
                 <div class="my-3">
-                    <button class="btn btn-success px-5">장바구니</button>
+                    <button class="btn btn-success px-5 cart">장바구니</button>
                     <button class="btn btn-warning px-5">바로구매</button>
                 </div>
             </div>
@@ -22,3 +22,39 @@
         <div><%=info.contents%></div>
     </div>
 </div>
+<script type="module">
+    import { app } from '/javascripts/config.js'
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    const db = getDatabase(app);
+
+    const isbn = '<%=info.isbn%>'
+    const title = '<%=info.title%>'
+    const thumbnail = '<%=info.thumbnail%>'
+    const publisher = '<%=info.publisher%>'
+    const authors = '<%=info.authors%>'
+    const contents = '<%=info.contents%>'
+    const price = '<%=info.price%>'
+
+    const info = { isbn, title, thumbnail, publisher, authors, contents, price }
+
+    console.log('uid : ' + uid)
+    console.log('email : '+ email)
+
+    // 장바구니 클릭한 경우
+    $(".cart").on("click", async function () {
+        if (email) {
+            const ref_cart = ref(db, `cart/${uid}/${isbn}`)
+            const snapshot = await get(ref_cart)
+
+            if (snapshot.val()) {
+                alert('장바구니에 이미 존재하는 도서')
+            } else {
+                await set(ref_cart, info)
+                alert('장바구니 추가 완료')
+            }
+        } else {
+            sessionStorage.setItem('target', window.location.href)
+            location.href = '/users/login'
+        }
+    })
+</script>
