@@ -9,6 +9,9 @@
                 <tr>
                     <td><img src="{{thumbnail}}" alt="thumbnail"></td>
                     <td>{{title}}<br>{{price}}<br>{{authors}}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm delete" isbn="{{isbn}}">삭제</button>
+                    </td>
                 </tr>
             {{/each}}
         </table>
@@ -16,9 +19,17 @@
 </div>
 <script type="module">
     import { app } from '/javascripts/config.js'
-    import { getDatabase, onValue, ref } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    import { getDatabase, onValue, ref, remove } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 
     const db = getDatabase(app);
+
+    // 삭제 버튼 클릭한 경우 장바구니에서 삭제
+    $('#div_list').on('click', '.delete', function () {
+        const isbn = $(this).attr("isbn")
+        if (confirm(`${isbn} 도서를 장바구니에서 삭제하시겠습니까?`)) {
+            remove(ref(db, `cart/${uid}/${isbn}`))
+        }
+    })
 
     onValue(ref(db, `cart/${uid}`), snapshot => {
         let rows = []

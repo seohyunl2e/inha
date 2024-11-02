@@ -25,7 +25,7 @@
                 <td>{{price}}</td>
                 <td>{{authors}}</td>
                 <td width="70"><%-include("modal_book.ejs")%></td>
-                <td width="70"><button class="btn btn-success btn-sm cart">카트</button></td>
+                <td width="70"><button class="btn btn-success btn-sm cart" book="{{funToString @this}}">카트</button></td>
             </tr>
             {{/each}}
         </table>
@@ -38,20 +38,38 @@
                 return "/images/no_image.jpg"
             }
         })
+
+        Handlebars.registerHelper("funToString", function (book) {
+            return JSON.stringify(book)
+        })
     </script>
 </div>
-<script>
-    let query=$(frm.query).val();
-    let page=1;
-    let size=5;
+<script type="module">
+    import { app } from '/javascripts/config.js'
+    import { getDatabase, get, set, ref } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
+    const db = getDatabase(app);
+
+    let query = $(frm.query).val();
+    let page = 1;
+    let size = 5;
 
     getList();
 
     // 카트 버튼
-    $('#div_list').on('click', function () {
+    $('#div_list').on('click', '.cart', async function () {
         if (email) {
-            // 장바구니에 추가
+            const book = JSON.parse($(this).attr('book'))
 
+            const ref_cart = ref(db, `cart/${uid}/${book.isbn}`)
+            const snapshot = await get(ref_cart)
+
+            if (snapshot.val()) {
+                alert('장바구니에 이미 존재하는 도서')
+            } else {
+                await set(ref_cart, book)
+                alert('장바구니 추가 완료')
+            }
         } else {
             sessionStorage.setItem('target', window.location.href)
             location.href = '/users/login'

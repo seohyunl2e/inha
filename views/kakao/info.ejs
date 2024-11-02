@@ -1,3 +1,10 @@
+<style>
+    i {
+        color: red;
+        font-size: 30px;
+        cursor: pointer;
+    }
+</style>
 <div class="my-5 row justify-content-center">
     <h1 class="text-center mb-5"><%=title%></h1>
     <div class="card col-md-10">
@@ -6,7 +13,10 @@
                 <img src='<%=info.thumbnail%>' width="80%" alt="thumbnail">
             </div>
             <div class="col align-self-center">
-                <h5><%=info.title%></h5>
+                <h5>
+                    <%=info.title%>
+                    <i id="heart"></i>
+                </h5>
                 <hr>
                 <div class="mb-3">가격 : <%=info.price%></div>
                 <div class="mb-3">출판사 : <%=info.publisher%></div>
@@ -24,7 +34,8 @@
 </div>
 <script type="module">
     import { app } from '/javascripts/config.js'
-    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    import { getDatabase, ref, set, get, remove, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+
     const db = getDatabase(app);
 
     const isbn = '<%=info.isbn%>'
@@ -37,8 +48,35 @@
 
     const info = { isbn, title, thumbnail, publisher, authors, contents, price }
 
-    console.log('uid : ' + uid)
-    console.log('email : '+ email)
+    const likeRef = ref(db, `favorite/${uid}/${isbn}`)
+
+    // 좋아요에 추가된 도서인지 체크
+    onValue(ref(db, `favorite/${uid}/${isbn}`), snapshot => {
+        if (uid) {
+            if (snapshot.size === 0) {
+                $("#heart").removeClass("bi-heart-fill");
+                $("#heart").addClass("bi-heart");
+            } else {
+                $("#heart").removeClass("bi-heart");
+                $("#heart").addClass("bi-heart-fill");
+            }
+        } else {
+            $('#heart').setAttribute('class', '')
+        }
+    });
+
+    $("#heart").on('click', function() {
+        // 빈 하트를 클릭한 경우
+        if ($(this).attr('class') === 'bi-heart') {
+            if (confirm('좋아요를 추가하시겠습니까?')) {
+                set(ref(db, `favorite/${uid}/${isbn}`), {info})
+            }
+        } else { // 채워진 하트를 클릭한 경우
+            if (confirm('좋아요를 취소하시겠습니까?')) {
+                remove(ref(db, `favorite/${uid}/${isbn}`))
+            }
+        }
+    })
 
     // 장바구니 클릭한 경우
     $(".cart").on("click", async function () {
