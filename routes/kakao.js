@@ -30,4 +30,9 @@ router.get('/blog', function(req, res, next) {
   res.render('index', { title: '블로그검색', pageName:'kakao/blog.ejs' });
 });
 
+// 리뷰
+router.get('/review', function(req, res, next) {
+  res.render('index', { title: '리뷰', pageName:'kakao/review.ejs' });
+});
+
 module.exports = router;

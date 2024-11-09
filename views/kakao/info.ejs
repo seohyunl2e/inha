@@ -32,6 +32,7 @@
         <div><%=info.contents%></div>
     </div>
 </div>
+<%-include("review.ejs")%>
 <script type="module">
     import { app } from '/javascripts/config.js'
     import { getDatabase, ref, set, get, remove, onValue } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
