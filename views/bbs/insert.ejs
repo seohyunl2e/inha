@@ -1,0 +1,39 @@
+<div class="my-5 row justify-content-center">
+    <h1 class="text-center mb-5">
+        <%=title%>
+    </h1>
+    <div class="col-md-8">
+        <form name="frm">
+            <input class="form-control mb-2" name="title" placeholder="제목을 입력하세요.">
+            <textarea class="form-control" rows="10" name="contents" placeholder="내용을 입력하세요."></textarea>
+            <div class="text-center mt-3">
+                <button class="btn btn-primary px-5">등록</button>
+                <button class="btn btn-secondary px-5" type="reset">취소</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="module">
+    import { app } from '/javascripts/config.js'
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const db = getFirestore(app);
+
+    // 게시글 등록
+    $(frm).on("submit", async function(e) {
+        e.preventDefault();
+
+        const title = $(frm.title).val();
+        const contents = $(frm.contents).val();
+
+        if (title === "") {
+            alert("제목을 입력하세요");
+            $(frm.title).focus();
+        } else {
+            const date = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+            await addDoc(collection(db, "bbs"), { email, date, title, contents });
+            alert("게시글 등록 완료");
+            location.href = "/bbs";
+        }
+    });
+</script>
